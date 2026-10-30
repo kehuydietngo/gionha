@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0068ff">
+<title>Đăng nhập Giỏ Nhà</title>
+<style>
+  :root{--bg:#f3f5f7;--ink:#182230;--muted:#667085;--brand:#0068ff}
+  *{box-sizing:border-box}html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px;line-height:1.5;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+  main{width:100%;max-width:380px;text-align:center;background:#fff;border-radius:16px;padding:28px 20px;box-shadow:0 1px 3px rgba(16,24,40,.08)}
+  h1{font-size:24px;margin:0 0 4px;color:var(--brand)}
+  p{margin:0 0 20px;color:var(--muted);font-size:15px}
+  #g{display:flex;justify-content:center;min-height:44px}
+  small{display:block;margin-top:16px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Giỏ Nhà</h1>
+  <p id="msg">Đăng nhập bằng tài khoản Google của bạn.</p>
+  <div id="g"></div>
+  <small>Giỏ Nhà chỉ nhận tên và email để tạo tài khoản. Không đăng gì lên Google của bạn.</small>
+</main>
+<script src="https://accounts.google.com/gsi/client" async defer onload="start()"></script>
+<script>
+  // This page lives on the fixed GitHub Pages origin (registered with Google). After sign-in it hands the
+  // Google ID token back to the current Giỏ Nhà address (link.txt), which verifies it on the server.
+  var CLIENT_ID="__CLIENT_ID__",msg=document.getElementById("msg");
+  function target(){return fetch("link.txt?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){t=t.trim();if(!/^https:\/\//.test(t))throw new Error();return new URL(t).origin})}
+  function done(credential){
+    msg.textContent="Đang quay lại Giỏ Nhà…";
+    target().then(function(origin){
+      if(window.opener&&!window.opener.closed){window.opener.postMessage({type:"gionha-google",credential:credential},origin);window.close();setTimeout(function(){location.replace(origin+"/#google="+encodeURIComponent(credential))},800)}
+      else location.replace(origin+"/#google="+encodeURIComponent(credential));
+    }).catch(function(){msg.textContent="Không tìm thấy địa chỉ Giỏ Nhà. Hãy thử lại sau ít phút."});
+  }
+  function start(){
+    google.accounts.id.initialize({client_id:CLIENT_ID,callback:function(r){if(r&&r.credential)done(r.credential)},ux_mode:"popup",auto_select:false});
+    google.accounts.id.renderButton(document.getElementById("g"),{type:"standard",theme:"outline",size:"large",text:"continue_with",shape:"pill",locale:"vi",width:300});
+  }
+</script>
+</body>
+</html>
