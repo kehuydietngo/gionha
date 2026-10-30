@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0068ff">
+<title>Giỏ Nhà</title>
+<style>
+  :root{--bg:#f3f5f7;--ink:#182230;--muted:#667085;--brand:#0068ff}
+  *{box-sizing:border-box}html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px;line-height:1.5;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+  main{width:100%;max-width:400px;text-align:center}
+  h1{font-size:30px;margin:0 0 6px;color:var(--brand)}
+  p{margin:0 0 20px;color:var(--muted)}
+  a.go{display:block;text-decoration:none;background:var(--brand);color:#fff;font-weight:600;font-size:18px;padding:16px 18px;border-radius:12px}
+  small{display:block;margin-top:18px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Giỏ Nhà</h1>
+  <p id="msg">Đang mở Giỏ Nhà…</p>
+  <a class="go" id="go" href="__LINK__">Mở Giỏ Nhà</a>
+  <small>Nếu trang không tự mở, bấm nút ở trên. Địa chỉ cập nhật lúc __TIME__.</small>
+</main>
+<script>
+  // Always read the newest address: link.txt is refreshed by the Mac mini whenever the tunnel address changes.
+  var go=document.getElementById("go");
+  fetch("link.txt?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){t=t.trim();if(/^https:\/\//.test(t)){go.href=t;location.replace(t+location.hash)}else{location.replace(go.href)}}).catch(function(){location.replace(go.href)});
+</script>
+</body>
+</html>
