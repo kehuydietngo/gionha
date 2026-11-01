@@ -27,9 +27,16 @@
 <script src="https://accounts.google.com/gsi/client" async defer onload="start()"></script>
 <script>
   // This page lives on the fixed GitHub Pages origin (registered with Google). After sign-in it hands the
-  // Google ID token back to the current Giỏ Nhà address (link.txt), which verifies it on the server.
-  var CLIENT_ID="__CLIENT_ID__",msg=document.getElementById("msg");
-  function target(){return fetch("link.txt?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){t=t.trim();if(!/^https:\/\//.test(t))throw new Error();return new URL(t).origin})}
+  // Google ID token back to the Giỏ Nhà address: the stable custom domain when available, else link.txt.
+  var CLIENT_ID="__CLIENT_ID__",msg=document.getElementById("msg"),FIXED="https://gionha.vn";
+  function usable(o){try{var u=new URL(o);return u.protocol==="https:"&&u.hostname.endsWith(".gionha.vn")}catch(e){return false}}
+  function target(){
+    return fetch("link.txt?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+      t=(t||"").trim();if(!/^https:\/\//.test(t))return FIXED;
+      // A throwaway tunnel address may be stale (or dead); the custom domain is authoritative.
+      return /\.trycloudflare\.com$/.test(new URL(t).hostname)?FIXED:new URL(t).origin;
+    }).catch(function(){return FIXED});
+  }
   function done(credential){
     msg.textContent="Đang quay lại Giỏ Nhà…";
     target().then(function(origin){
